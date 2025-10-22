@@ -177,95 +177,96 @@ include '../components/head.php';
                                 </div>
                             <?php else: ?>
                                 <div class="list-group list-group-flush">
-                                <?php foreach ($upcomingDeadlines as $deadline): ?>
-                                    <?php
-                                    $daysLeft = daysUntilDeadline($deadline['deadline_date']);
-                                    $urgencyClass = $daysLeft < 0 ? 'overdue' : ($daysLeft <= 3 ? 'urgent' : ($daysLeft <= 7 ? 'warning' : 'normal'));
-                                    ?>
-                                    <div class="deadline-item <?php echo $urgencyClass; ?>">
-                                        <div class="deadline-info">
-                                            <h4><?php echo htmlspecialchars($deadline['tax_name']); ?></h4>
-                                            <p class="deadline-form"><?php echo htmlspecialchars($deadline['bir_form']); ?> - <?php echo htmlspecialchars($deadline['filing_period']); ?></p>
+                                    <?php foreach ($upcomingDeadlines as $deadline): ?>
+                                        <?php
+                                        $daysLeft = daysUntilDeadline($deadline['deadline_date']);
+                                        $badgeClass = $daysLeft < 0 ? 'bg-danger' : ($daysLeft <= 3 ? 'bg-danger' : ($daysLeft <= 7 ? 'bg-warning' : 'bg-success'));
+                                        ?>
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1 fw-semibold"><?php echo htmlspecialchars($deadline['tax_name']); ?></h6>
+                                                    <p class="mb-1 small text-muted">
+                                                        <i class="bi bi-file-text me-1"></i><?php echo htmlspecialchars($deadline['bir_form']); ?> - 
+                                                        <?php echo htmlspecialchars($deadline['filing_period']); ?>
+                                                    </p>
+                                                    <div class="d-flex align-items-center gap-2 mt-2">
+                                                        <span class="badge <?php echo $badgeClass; ?>" data-deadline="<?php echo $deadline['deadline_date']; ?>">
+                                                            <?php 
+                                                            if ($daysLeft < 0) {
+                                                                echo abs($daysLeft) . ' days overdue';
+                                                            } elseif ($daysLeft == 0) {
+                                                                echo 'DUE TODAY';
+                                                            } else {
+                                                                echo $daysLeft . ' day' . ($daysLeft != 1 ? 's' : '') . ' left';
+                                                            }
+                                                            ?>
+                                                        </span>
+                                                        <small class="text-muted">
+                                                            <i class="bi bi-calendar me-1"></i><?php echo formatDate($deadline['deadline_date'], 'M d, Y'); ?>
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                                <a href="mark_filed.php?id=<?php echo $deadline['deadline_id']; ?>" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-check2"></i> Mark Filed
+                                                </a>
+                                            </div>
                                         </div>
-                                        <div class="deadline-date">
-                                            <span class="date"><?php echo formatDate($deadline['deadline_date'], 'M d, Y'); ?></span>
-                                            <span class="days-left" data-deadline="<?php echo $deadline['deadline_date']; ?>">
-                                                <?php 
-                                                if ($daysLeft < 0) {
-                                                    echo abs($daysLeft) . ' days overdue';
-                                                } elseif ($daysLeft == 0) {
-                                                    echo 'DUE TODAY';
-                                                } else {
-                                                    echo $daysLeft . ' day' . ($daysLeft != 1 ? 's' : '') . ' left';
-                                                }
-                                                ?>
-                                            </span>
-                                        </div>
-                                        <div class="deadline-actions">
-                                            <a href="mark_filed.php?id=<?php echo $deadline['deadline_id']; ?>" class="btn-sm">Mark Filed</a>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
                 
                 <!-- Tax Updates -->
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <h2>📰 Recent Tax Updates</h2>
-                        <a href="updates.php" class="link-button">View All</a>
-                    </div>
-                    <div class="card-content">
-                        <?php if (empty($taxUpdates)): ?>
-                            <p class="empty-state">No recent updates</p>
-                        <?php else: ?>
-                            <div class="updates-list">
-                                <?php foreach ($taxUpdates as $update): ?>
-                                    <div class="update-item">
-                                        <div class="update-header">
-                                            <h4><?php echo htmlspecialchars($update['title']); ?></h4>
-                                            <span class="update-date"><?php echo formatDate($update['published_at'], 'M d, Y'); ?></span>
+                <div class="col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="bi bi-newspaper me-2"></i>Tax Updates
+                            </h5>
+                            <a href="updates.php" class="btn btn-sm btn-outline-primary">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <?php if (empty($taxUpdates)): ?>
+                                <div class="text-center py-4">
+                                    <i class="bi bi-info-circle text-muted" style="font-size: 2.5rem;"></i>
+                                    <p class="text-muted mt-3 mb-0 small">No recent updates</p>
+                                </div>
+                            <?php else: ?>
+                                <div class="d-flex flex-column gap-3">
+                                    <?php foreach ($taxUpdates as $update): ?>
+                                        <div class="border-start border-primary border-3 ps-3">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="mb-0 fw-semibold"><?php echo htmlspecialchars($update['title']); ?></h6>
+                                                <?php if ($update['action_required']): ?>
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="bi bi-exclamation-triangle"></i>
+                                                    </span>
+                                                <?php endif; ?>
+                                            </div>
+                                            <p class="small text-muted mb-2"><?php echo htmlspecialchars(substr($update['summary'], 0, 100)) . '...'; ?></p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-clock me-1"></i><?php echo formatDate($update['published_at'], 'M d'); ?>
+                                                </small>
+                                                <a href="update_details.php?id=<?php echo $update['update_id']; ?>" class="btn btn-link btn-sm p-0">
+                                                    Read more <i class="bi bi-arrow-right"></i>
+                                                </a>
+                                            </div>
                                         </div>
-                                        <p><?php echo htmlspecialchars(substr($update['summary'], 0, 150)) . '...'; ?></p>
-                                        <?php if ($update['action_required']): ?>
-                                            <span class="badge badge-warning">Action Required</span>
-                                        <?php endif; ?>
-                                        <a href="update_details.php?id=<?php echo $update['update_id']; ?>" class="read-more">Read more →</a>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <h2>Quick Actions</h2>
-                <div class="action-buttons">
-                    <a href="upload_withholding.php" class="action-btn">
-                        <span class="icon">📊</span>
-                        <span class="text">Upload Withholding List</span>
-                    </a>
-                    <a href="deadlines.php" class="action-btn">
-                        <span class="icon">📅</span>
-                        <span class="text">View All Deadlines</span>
-                    </a>
-                    <a href="submissions.php" class="action-btn">
-                        <span class="icon">📁</span>
-                        <span class="text">Filing Archive</span>
-                    </a>
-                    <a href="settings.php" class="action-btn">
-                        <span class="icon">⚙️</span>
-                        <span class="text">Reminder Settings</span>
-                    </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
     
-    <script src="../assets/js/main.js"></script>
-</body>
-</html>
+    <!-- Include modern footer -->
+    <?php include '../components/foot.php'; ?>

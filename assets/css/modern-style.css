@@ -123,7 +123,35 @@ h1, h2, h3, h4, h5, h6 {
     height: 100vh;
     z-index: 1040;
     overflow-y: auto;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+/* Sidebar closed state (desktop) */
+.sidebar.closed {
+    width: 80px;
+}
+
+.sidebar.closed .sidebar-user-card .user-info,
+.sidebar.closed .nav-link span:not(.badge),
+.sidebar.closed .nav-section-title {
+    opacity: 0;
+    display: none;
+}
+
+.sidebar.closed .sidebar-user-card {
+    padding: 1rem 0.5rem;
+    text-align: center;
+}
+
+.sidebar.closed .nav-link {
+    justify-content: center;
+    padding: 0.75rem;
+}
+
+.sidebar.closed .nav-link .badge {
+    position: absolute;
+    top: 0.5rem;
+    right: 1rem;
 }
 
 .sidebar-header {
@@ -141,6 +169,17 @@ h1, h2, h3, h4, h5, h6 {
 .sidebar-body {
     height: calc(100vh - var(--navbar-height));
     overflow-y: auto;
+    transition: all 0.3s ease;
+}
+
+/* Main wrapper adjustment for sidebar */
+.main-wrapper {
+    margin-left: var(--sidebar-width);
+    transition: margin-left 0.3s ease;
+}
+
+.main-wrapper.sidebar-closed {
+    margin-left: 80px;
 }
 
 /* Sidebar Navigation */

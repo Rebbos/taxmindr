@@ -44,70 +44,77 @@ $stmt->execute($params);
 $deadlines = $stmt->fetchAll();
 
 $pageTitle = 'Tax Deadlines - TaxMindr';
+
+// Include modern head
+include '../components/head.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle; ?></title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/dashboard.css">
-</head>
+
 <body>
-    <?php include '../includes/header.php'; ?>
+    <!-- Include modern navbar -->
+    <?php include '../components/navbar.php'; ?>
     
-    <div class="dashboard-container">
-        <?php include '../includes/sidebar.php'; ?>
+    <div class="d-flex">
+        <!-- Include modern sidebar -->
+        <?php include '../components/sidebar.php'; ?>
         
-        <main class="dashboard-main">
-            <div class="page-header">
+        <!-- Main Content -->
+        <main class="main-wrapper flex-grow-1">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 fade-in-up">
                 <div>
-                    <h1>📅 Tax Deadlines</h1>
-                    <p>Track and manage your tax filing deadlines</p>
+                    <h1 class="h3 fw-bold mb-2">
+                        <i class="bi bi-calendar-event me-2"></i>Tax Deadlines
+                    </h1>
+                    <p class="text-muted mb-0">Track and manage your tax filing deadlines</p>
                 </div>
-                <div>
-                    <a href="add_deadline.php" class="btn-primary">+ Add Deadline</a>
-                </div>
+                <a href="add_deadline.php" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i>Add Deadline
+                </a>
             </div>
             
             <!-- Filters -->
-            <div class="filters-bar">
-                <div class="filter-group">
-                    <label>Period:</label>
-                    <select id="period-filter" onchange="applyFilters()">
-                        <option value="upcoming" <?php echo $period === 'upcoming' ? 'selected' : ''; ?>>Upcoming</option>
-                        <option value="overdue" <?php echo $period === 'overdue' ? 'selected' : ''; ?>>Overdue</option>
-                        <option value="this_month" <?php echo $period === 'this_month' ? 'selected' : ''; ?>>This Month</option>
-                        <option value="all" <?php echo $period === 'all' ? 'selected' : ''; ?>>All Time</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label>Status:</label>
-                    <select id="status-filter" onchange="applyFilters()">
-                        <option value="all" <?php echo $status === 'all' ? 'selected' : ''; ?>>All Status</option>
-                        <option value="pending" <?php echo $status === 'pending' ? 'selected' : ''; ?>>Pending</option>
-                        <option value="filed" <?php echo $status === 'filed' ? 'selected' : ''; ?>>Filed</option>
-                        <option value="paid" <?php echo $status === 'paid' ? 'selected' : ''; ?>>Paid</option>
-                        <option value="late" <?php echo $status === 'late' ? 'selected' : ''; ?>>Late</option>
-                    </select>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Period:</label>
+                            <select id="period-filter" class="form-select" onchange="applyFilters()">
+                                <option value="upcoming" <?php echo $period === 'upcoming' ? 'selected' : ''; ?>>Upcoming</option>
+                                <option value="overdue" <?php echo $period === 'overdue' ? 'selected' : ''; ?>>Overdue</option>
+                                <option value="this_month" <?php echo $period === 'this_month' ? 'selected' : ''; ?>>This Month</option>
+                                <option value="all" <?php echo $period === 'all' ? 'selected' : ''; ?>>All Time</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Status:</label>
+                            <select id="status-filter" class="form-select" onchange="applyFilters()">
+                                <option value="all" <?php echo $status === 'all' ? 'selected' : ''; ?>>All Status</option>
+                                <option value="pending" <?php echo $status === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                <option value="filed" <?php echo $status === 'filed' ? 'selected' : ''; ?>>Filed</option>
+                                <option value="paid" <?php echo $status === 'paid' ? 'selected' : ''; ?>>Paid</option>
+                                <option value="late" <?php echo $status === 'late' ? 'selected' : ''; ?>>Late</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
             
             <!-- Deadlines List -->
-            <div class="content-card">
+            <div class="card">
                 <?php if (empty($deadlines)): ?>
-                    <div class="empty-state">
-                        <div class="empty-icon">📅</div>
-                        <h3>No deadlines found</h3>
-                        <p>Add your first tax deadline to get started</p>
-                        <a href="add_deadline.php" class="btn-primary">Add Deadline</a>
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-calendar-x text-muted" style="font-size: 4rem;"></i>
+                        <h3 class="mt-3">No deadlines found</h3>
+                        <p class="text-muted">Add your first tax deadline to get started</p>
+                        <a href="add_deadline.php" class="btn btn-primary mt-3">
+                            <i class="bi bi-plus-lg me-1"></i>Add Deadline
+                        </a>
                     </div>
                 <?php else: ?>
-                    <div class="deadlines-table">
-                        <table>
-                            <thead>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
                                 <tr>
                                     <th>Tax Type</th>
                                     <th>BIR Form</th>
@@ -115,7 +122,7 @@ $pageTitle = 'Tax Deadlines - TaxMindr';
                                     <th>Deadline</th>
                                     <th>Days Left</th>
                                     <th>Status</th>
-                                    <th>Actions</th>
+                                    <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -145,15 +152,30 @@ $pageTitle = 'Tax Deadlines - TaxMindr';
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="status-badge status-<?php echo $deadline['status']; ?>">
+                                            <?php
+                                            $badgeMap = [
+                                                'pending' => 'bg-warning text-dark',
+                                                'filed' => 'bg-info',
+                                                'paid' => 'bg-success',
+                                                'late' => 'bg-danger'
+                                            ];
+                                            $badgeClass = $badgeMap[$deadline['status']] ?? 'bg-secondary';
+                                            ?>
+                                            <span class="badge <?php echo $badgeClass; ?>">
                                                 <?php echo ucfirst($deadline['status']); ?>
                                             </span>
                                         </td>
-                                        <td class="actions">
-                                            <?php if ($deadline['status'] === 'pending'): ?>
-                                                <a href="mark_filed.php?id=<?php echo $deadline['deadline_id']; ?>" class="btn-sm">Mark Filed</a>
-                                            <?php endif; ?>
-                                            <a href="edit_deadline.php?id=<?php echo $deadline['deadline_id']; ?>" class="btn-sm btn-secondary">Edit</a>
+                                        <td class="text-end">
+                                            <div class="btn-group btn-group-sm">
+                                                <?php if ($deadline['status'] === 'pending'): ?>
+                                                    <a href="mark_filed.php?id=<?php echo $deadline['deadline_id']; ?>" class="btn btn-outline-success" title="Mark Filed">
+                                                        <i class="bi bi-check2"></i>
+                                                    </a>
+                                                <?php endif; ?>
+                                                <a href="edit_deadline.php?id=<?php echo $deadline['deadline_id']; ?>" class="btn btn-outline-primary" title="Edit">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -165,7 +187,6 @@ $pageTitle = 'Tax Deadlines - TaxMindr';
         </main>
     </div>
     
-    <script src="../assets/js/main.js"></script>
     <script>
         function applyFilters() {
             const period = document.getElementById('period-filter').value;
@@ -174,13 +195,14 @@ $pageTitle = 'Tax Deadlines - TaxMindr';
         }
     </script>
     
-    <style>
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 2rem;
-        }
+    <!-- Include modern footer -->
+    <?php include '../components/foot.php'; ?>
+    
+    <!-- Include modern footer -->
+    <?php include '../components/foot.php'; ?>
+
+<style>
+    /* Deadline-specific styles */
         
         .filters-bar {
             display: flex;
@@ -303,15 +325,4 @@ $pageTitle = 'Tax Deadlines - TaxMindr';
             border: 1px solid var(--primary-color);
         }
         
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-        }
-        
-        .empty-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-    </style>
-</body>
-</html>
+

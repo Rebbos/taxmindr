@@ -92,27 +92,25 @@ $stmt->execute([$userId]);
 $recentUploads = $stmt->fetchAll();
 
 $pageTitle = 'Upload Withholding List - TaxMindr';
+
+// Include modern head
+include '../components/head.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle; ?></title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/dashboard.css">
-    <link rel="stylesheet" href="../assets/css/forms.css">
-</head>
+
 <body>
-    <?php include '../includes/header.php'; ?>
+    <!-- Include modern navbar -->
+    <?php include '../components/navbar.php'; ?>
     
-    <div class="dashboard-container">
-        <?php include '../includes/sidebar.php'; ?>
+    <div class="d-flex">
+        <!-- Include modern sidebar -->
+        <?php include '../components/sidebar.php'; ?>
         
-        <main class="dashboard-main">
-            <div class="page-header">
+        <!-- Main Content -->
+        <main class="main-wrapper flex-grow-1">
+            <div class="d-flex justify-content-between align-items-center mb-4 fade-in-up">
                 <div>
-                    <h1>📊 Upload Withholding List</h1>
+                    <h1 class="h3 fw-bold mb-2">
+                        <i class="bi bi-file-earmark-spreadsheet me-2"></i>Upload Withholding List</h1>
                     <p>Upload and validate your withholding tax lists</p>
                 </div>
             </div>
@@ -294,5 +292,6 @@ $pageTitle = 'Upload Withholding List - TaxMindr';
             }
         }
     </style>
-</body>
-</html>
+    
+    <!-- Include modern footer -->
+    <?php include '../components/foot.php'; ?>

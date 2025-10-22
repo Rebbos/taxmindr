@@ -39,11 +39,43 @@ function initTooltips() {
 function initSidebar() {
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const sidebarToggle = document.getElementById('sidebarToggle');
     const toggleButtons = document.querySelectorAll('[data-sidebar-toggle]');
+    const mainWrapper = document.querySelector('.main-wrapper');
     
     if (!sidebar) return;
     
-    // Toggle sidebar
+    // Load sidebar state from localStorage (desktop only)
+    if (window.innerWidth >= 992) {
+        const sidebarState = localStorage.getItem('sidebarState');
+        if (sidebarState === 'closed') {
+            sidebar.classList.add('closed');
+            if (mainWrapper) mainWrapper.classList.add('sidebar-closed');
+        }
+    }
+    
+    // Toggle sidebar via burger menu
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            // Desktop: toggle closed class
+            if (window.innerWidth >= 992) {
+                sidebar.classList.toggle('closed');
+                if (mainWrapper) mainWrapper.classList.toggle('sidebar-closed');
+                
+                // Save state to localStorage
+                const isClosed = sidebar.classList.contains('closed');
+                localStorage.setItem('sidebarState', isClosed ? 'closed' : 'open');
+            } 
+            // Mobile: toggle show class (slide in/out)
+            else {
+                sidebar.classList.toggle('show');
+                sidebarOverlay.classList.toggle('show');
+                document.body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
+            }
+        });
+    }
+    
+    // Toggle sidebar via data attribute buttons
     toggleButtons.forEach(button => {
         button.addEventListener('click', function() {
             sidebar.classList.toggle('show');

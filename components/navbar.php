@@ -1,6 +1,13 @@
 <!-- Modern Navigation Bar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm">
     <div class="container-fluid px-4">
+        <!-- Burger Menu for Sidebar Toggle (only show when logged in on pages with sidebar) -->
+        <?php if (isset($_SESSION['user_id']) && basename($_SERVER['PHP_SELF']) !== 'index.php'): ?>
+        <button class="btn btn-link text-dark p-0 me-3" id="sidebarToggle" type="button" style="font-size: 1.5rem;">
+            <i class="bi bi-list"></i>
+        </button>
+        <?php endif; ?>
+        
         <!-- Brand -->
         <a class="navbar-brand d-flex align-items-center" href="<?php echo APP_URL; ?>/public/index.php">
             <div class="brand-icon me-2">

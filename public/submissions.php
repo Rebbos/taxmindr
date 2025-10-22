@@ -23,23 +23,21 @@ $stmt->execute([$userId]);
 $submissions = $stmt->fetchAll();
 
 $pageTitle = 'Filing Archive - TaxMindr';
+
+// Include modern head
+include '../components/head.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle; ?></title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/dashboard.css">
-</head>
+
 <body>
-    <?php include '../includes/header.php'; ?>
+    <!-- Include modern navbar -->
+    <?php include '../components/navbar.php'; ?>
     
-    <div class="dashboard-container">
-        <?php include '../includes/sidebar.php'; ?>
+    <div class="d-flex">
+        <!-- Include modern sidebar -->
+        <?php include '../components/sidebar.php'; ?>
         
-        <main class="dashboard-main">
+        <!-- Main Content -->
+        <main class="main-wrapper flex-grow-1">
             <div class="page-header">
                 <div>
                     <h1>📁 Filing Archive</h1>
@@ -136,5 +134,6 @@ $pageTitle = 'Filing Archive - TaxMindr';
             color: #991b1b;
         }
     </style>
-</body>
-</html>
+    
+    <!-- Include modern footer -->
+    <?php include '../components/foot.php'; ?>
