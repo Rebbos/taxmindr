@@ -11,23 +11,56 @@ echo "============================\n\n";
 
 try {
     // Create database connection without selecting a database
+    echo "Connecting to MySQL...\n";
     $dsn = "mysql:host=" . DB_HOST . ";charset=" . DB_CHARSET;
     $pdo = new PDO($dsn, DB_USER, DB_PASS);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    echo "✓ Connected to MySQL\n\n";
     
     // Create database if it doesn't exist
     echo "Creating database '" . DB_NAME . "'...\n";
-    $pdo->exec("CREATE DATABASE IF NOT EXISTS " . DB_NAME . " CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+    $pdo->exec("CREATE DATABASE IF NOT EXISTS `" . DB_NAME . "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
     echo "✓ Database created successfully\n\n";
     
     // Select the database
-    $pdo->exec("USE " . DB_NAME);
+    $pdo->exec("USE `" . DB_NAME . "`");
+    echo "Using database '" . DB_NAME . "'\n\n";
     
     // Read and execute schema.sql
     echo "Installing database schema...\n";
-    $schema = file_get_contents(__DIR__ . '/../database/schema.sql');
-    $pdo->exec($schema);
-    echo "✓ Schema installed successfully\n\n";
+    $schemaFile = __DIR__ . '/../database/schema.sql';
+    
+    if (!file_exists($schemaFile)) {
+        throw new Exception("Schema file not found: $schemaFile");
+    }
+    
+    $schema = file_get_contents($schemaFile);
+    
+    // Split into individual statements
+    // Remove comments first
+    $schema = preg_replace('/^--.*$/m', '', $schema);
+    $schema = preg_replace('/\/\*.*?\*\//s', '', $schema);
+    
+    // Split by semicolon followed by newline
+    $statements = explode(';', $schema);
+    
+    $executedCount = 0;
+    foreach ($statements as $statement) {
+        $statement = trim($statement);
+        if (!empty($statement)) {
+            try {
+                $pdo->exec($statement);
+                $executedCount++;
+                // Show which table was created
+                if (preg_match('/CREATE TABLE.*?`?(\w+)`?\s*\(/i', $statement, $matches)) {
+                    echo "  ✓ Created table: {$matches[1]}\n";
+                }
+            } catch (PDOException $e) {
+                echo "  ⚠ Warning: " . $e->getMessage() . "\n";
+            }
+        }
+    }
+    echo "✓ Schema installed successfully ($executedCount statements executed)\n\n";
     
     // Insert sample tax types
     echo "Inserting sample data...\n";
@@ -35,11 +68,21 @@ try {
     echo "✓ Sample data inserted successfully\n\n";
     
     echo "============================\n";
-    echo "Installation completed successfully!\n";
-    echo "You can now access TaxMindr at: " . APP_URL . "\n";
+    echo "✅ Installation completed successfully!\n\n";
+    echo "Next steps:\n";
+    echo "1. Access homepage: " . APP_URL . "/public/index.php\n";
+    echo "2. Register account: " . APP_URL . "/public/register.php\n";
+    echo "3. Test connection: " . APP_URL . "/scripts/test_connection.php\n";
     
 } catch (PDOException $e) {
-    echo "✗ Installation failed: " . $e->getMessage() . "\n";
+    echo "\n✗ Database Error: " . $e->getMessage() . "\n\n";
+    echo "Troubleshooting:\n";
+    echo "1. Make sure MySQL is running in XAMPP Control Panel\n";
+    echo "2. Check database credentials in config/database.php\n";
+    echo "3. Default XAMPP: username='root', password='' (empty)\n";
+    exit(1);
+} catch (Exception $e) {
+    echo "\n✗ Error: " . $e->getMessage() . "\n";
     exit(1);
 }
 

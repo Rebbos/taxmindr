@@ -1,6 +1,6 @@
 <?php
 /**
- * User Dashboard
+ * User Dashboard - Modern Bootstrap 5 Design
  * TaxMindr - Philippine Tax Compliance Platform
  */
 
@@ -9,6 +9,7 @@ requireLogin();
 
 $pdo = getDBConnection();
 $userId = $_SESSION['user_id'];
+$pageTitle = 'Dashboard - TaxMindr';
 
 // Get user info
 $stmt = $pdo->prepare("SELECT * FROM users WHERE user_id = ?");
@@ -74,77 +75,108 @@ $stmt = $pdo->prepare("
 $stmt->execute([$userId]);
 $stats['overdue'] = $stmt->fetch()['count'];
 
-$pageTitle = 'Dashboard - TaxMindr';
+
+// Include modern head
+include '../components/head.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle; ?></title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/dashboard.css">
-</head>
+
 <body>
-    <?php include '../includes/header.php'; ?>
+    <!-- Include modern navbar -->
+    <?php include '../components/navbar.php'; ?>
     
-    <div class="dashboard-container">
-        <?php include '../includes/sidebar.php'; ?>
+    <div class="d-flex">
+        <!-- Include modern sidebar -->
+        <?php include '../components/sidebar.php'; ?>
         
-        <main class="dashboard-main">
-            <div class="dashboard-header">
-                <h1>Welcome back, <?php echo htmlspecialchars($user['first_name']); ?>! 👋</h1>
-                <p>Here's your tax compliance overview</p>
+        <!-- Main Content -->
+        <main class="main-wrapper flex-grow-1">
+            <!-- Page Header -->
+            <div class="mb-4 fade-in-up">
+                <h1 class="h3 fw-bold mb-2">
+                    Welcome back, <?php echo htmlspecialchars($user['first_name']); ?>! 
+                    <span class="wave">👋</span>
+                </h1>
+                <p class="text-muted mb-0">Here's your tax compliance overview</p>
             </div>
             
             <!-- Statistics Cards -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon pending">⏳</div>
-                    <div class="stat-content">
-                        <h3><?php echo $stats['pending']; ?></h3>
-                        <p>Pending Deadlines</p>
+            <div class="row g-4 mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-primary">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon bg-primary-subtle me-3">
+                                <i class="bi bi-hourglass-split"></i>
+                            </div>
+                            <div>
+                                <h3 class="h2 mb-0 fw-bold"><?php echo $stats['pending']; ?></h3>
+                                <p class="text-muted mb-0 small">Pending Deadlines</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="stat-card">
-                    <div class="stat-icon upcoming">⚠️</div>
-                    <div class="stat-content">
-                        <h3><?php echo $stats['upcoming']; ?></h3>
-                        <p>Due Within 7 Days</p>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-warning">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon me-3" style="background: #fef3c7; color: #f59e0b;">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div>
+                                <h3 class="h2 mb-0 fw-bold"><?php echo $stats['upcoming']; ?></h3>
+                                <p class="text-muted mb-0 small">Due Within 7 Days</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="stat-card">
-                    <div class="stat-icon filed">✅</div>
-                    <div class="stat-content">
-                        <h3><?php echo $stats['filed']; ?></h3>
-                        <p>Filed This Month</p>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-success">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon me-3" style="background: #d1fae5; color: #10b981;">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                            <div>
+                                <h3 class="h2 mb-0 fw-bold"><?php echo $stats['filed']; ?></h3>
+                                <p class="text-muted mb-0 small">Filed This Month</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="stat-card">
-                    <div class="stat-icon overdue">❌</div>
-                    <div class="stat-content">
-                        <h3><?php echo $stats['overdue']; ?></h3>
-                        <p>Overdue</p>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-danger">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon me-3" style="background: #fee2e2; color: #ef4444;">
+                                <i class="bi bi-x-circle"></i>
+                            </div>
+                            <div>
+                                <h3 class="h2 mb-0 fw-bold"><?php echo $stats['overdue']; ?></h3>
+                                <p class="text-muted mb-0 small">Overdue</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <!-- Main Content Grid -->
-            <div class="dashboard-grid">
+            <div class="row g-4">
                 <!-- Upcoming Deadlines -->
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <h2>📅 Upcoming Deadlines</h2>
-                        <a href="deadlines.php" class="link-button">View All</a>
-                    </div>
-                    <div class="card-content">
-                        <?php if (empty($upcomingDeadlines)): ?>
-                            <p class="empty-state">No upcoming deadlines. You're all caught up! 🎉</p>
-                        <?php else: ?>
-                            <div class="deadline-list">
+                <div class="col-lg-8">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="bi bi-calendar-event me-2"></i>Upcoming Deadlines
+                            </h5>
+                            <a href="deadlines.php" class="btn btn-sm btn-outline-primary">View All</a>
+                        </div>
+                        <div class="card-body">
+                            <?php if (empty($upcomingDeadlines)): ?>
+                                <div class="text-center py-5">
+                                    <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                                    <p class="text-muted mt-3 mb-0">No upcoming deadlines. You're all caught up! 🎉</p>
+                                </div>
+                            <?php else: ?>
+                                <div class="list-group list-group-flush">
                                 <?php foreach ($upcomingDeadlines as $deadline): ?>
                                     <?php
                                     $daysLeft = daysUntilDeadline($deadline['deadline_date']);
