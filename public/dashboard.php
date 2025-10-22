@@ -5,7 +5,7 @@
  */
 
 require_once '../config/config.php';
-requireLogin();
+requireUser(); // Only regular users can access, not admins
 
 $pdo = getDBConnection();
 $userId = $_SESSION['user_id'];

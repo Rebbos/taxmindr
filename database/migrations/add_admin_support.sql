@@ -1,17 +1,14 @@
--- Migration: Add Admin Support to TaxMindr
--- This script adds admin functionality to existing database
+-- Migration: Add Admin Support to TaxMindr (Separate Tables Approach)
+-- This script creates a separate admins table
 
--- Step 1: Modify users table to add 'admin' to user_type ENUM
-ALTER TABLE users 
-MODIFY COLUMN user_type ENUM('admin', 'individual', 'business', 'freelancer', 'organization') NOT NULL;
-
--- Add index for user_type if not exists
-ALTER TABLE users ADD INDEX IF NOT EXISTS idx_user_type (user_type);
-
--- Step 2: Create admins table
+-- Step 1: Create admins table (SEPARATE from users table)
 CREATE TABLE IF NOT EXISTS admins (
     admin_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL UNIQUE,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    mobile_number VARCHAR(20),
     role ENUM('super_admin', 'admin', 'moderator', 'support') DEFAULT 'admin',
     permissions JSON,
     can_manage_users BOOLEAN DEFAULT TRUE,
@@ -20,13 +17,16 @@ CREATE TABLE IF NOT EXISTS admins (
     can_manage_system_settings BOOLEAN DEFAULT FALSE,
     department VARCHAR(100),
     notes TEXT,
+    email_verified BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    last_login TIMESTAMP NULL,
+    status ENUM('active', 'inactive', 'suspended') DEFAULT 'active',
+    INDEX idx_email (email),
     INDEX idx_role (role)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Step 3: Create admin_logs table
+-- Step 2: Create admin_logs table
 CREATE TABLE IF NOT EXISTS admin_logs (
     log_id INT AUTO_INCREMENT PRIMARY KEY,
     admin_id INT NOT NULL,
@@ -85,28 +85,16 @@ CREATE TABLE IF NOT EXISTS user_reports (
     INDEX idx_assigned (assigned_to)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Step 6: Update tax_types applicable_to to include admin
-ALTER TABLE tax_types 
-MODIFY COLUMN applicable_to SET('admin', 'individual', 'business', 'freelancer', 'organization');
+-- Step 6: Remove user_type modifications (not needed with separate tables)
+-- Users table stays as is for regular users only
+-- Admins table is completely separate
 
--- Step 7: Update tax_updates affected_taxpayers to include admin
-ALTER TABLE tax_updates 
-MODIFY COLUMN affected_taxpayers SET('admin', 'individual', 'business', 'freelancer', 'organization');
-
--- Step 8: Create default super admin (change password after first login!)
-INSERT INTO users (email, password_hash, first_name, last_name, user_type, status)
-VALUES ('admin@taxmindr.com', '$2y$10$YourHashedPasswordHere', 'System', 'Administrator', 'admin', 'active')
-ON DUPLICATE KEY UPDATE user_type = 'admin';
-
--- Step 9: Create admin record for the super admin
--- Note: This assumes user_id = 1 is the admin. Adjust if needed.
-INSERT INTO admins (user_id, role, can_manage_users, can_manage_tax_updates, can_view_analytics, can_manage_system_settings, department)
-SELECT user_id, 'super_admin', TRUE, TRUE, TRUE, TRUE, 'System Administration'
-FROM users 
-WHERE email = 'admin@taxmindr.com'
+-- Step 7: Create default super admin (change password after first login!)
+INSERT INTO admins (email, password_hash, first_name, last_name, role, status, can_manage_system_settings, department)
+VALUES ('admin@taxmindr.com', '$2y$10$YourHashedPasswordHere', 'System', 'Administrator', 'super_admin', 'active', TRUE, 'System Administration')
 ON DUPLICATE KEY UPDATE role = 'super_admin', can_manage_system_settings = TRUE;
 
--- Step 10: Insert default system settings
+-- Step 8: Insert default system settings
 INSERT INTO system_settings (setting_key, setting_value, setting_type, description, is_public) VALUES
 ('app_name', 'TaxMindr', 'text', 'Application name', TRUE),
 ('maintenance_mode', 'false', 'boolean', 'Enable/disable maintenance mode', FALSE),

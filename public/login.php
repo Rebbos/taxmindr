@@ -24,41 +24,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo = getDBConnection();
             
+            // First, check in admins table
             $stmt = $pdo->prepare("
-                SELECT user_id, email, password_hash, first_name, last_name, user_type, status 
-                FROM users 
+                SELECT admin_id as id, email, password_hash, first_name, last_name, role, status, 'admin' as account_type
+                FROM admins 
                 WHERE email = ?
             ");
             $stmt->execute([$email]);
-            $user = $stmt->fetch();
+            $admin = $stmt->fetch();
+            
+            // If not found in admins, check in users table
+            if (!$admin) {
+                $stmt = $pdo->prepare("
+                    SELECT user_id as id, email, password_hash, first_name, last_name, user_type, status, 'user' as account_type
+                    FROM users 
+                    WHERE email = ?
+                ");
+                $stmt->execute([$email]);
+                $user = $stmt->fetch();
+            } else {
+                $user = $admin;
+            }
             
             if ($user && password_verify($password, $user['password_hash'])) {
                 if ($user['status'] !== 'active') {
                     $errors[] = 'Account is inactive or suspended';
                 } else {
-                    // Set session
-                    $_SESSION['user_id'] = $user['user_id'];
+                    // Set common session variables
                     $_SESSION['email'] = $user['email'];
                     $_SESSION['first_name'] = $user['first_name'];
                     $_SESSION['last_name'] = $user['last_name'];
-                    $_SESSION['user_type'] = $user['user_type'];
+                    $_SESSION['account_type'] = $user['account_type'];
                     
-                    // Update last login
-                    $stmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE user_id = ?");
-                    $stmt->execute([$user['user_id']]);
-                    
-                    // Log activity
-                    logActivity($pdo, $user['user_id'], 'login', 'User logged in');
-                    
-                    // Role-based redirection
-                    if ($user['user_type'] === 'admin') {
-                        // Check if admin record exists, if not redirect to admin dashboard
-                        $stmt = $pdo->prepare("SELECT admin_id FROM admins WHERE user_id = ?");
-                        $stmt->execute([$user['user_id']]);
+                    if ($user['account_type'] === 'admin') {
+                        // Admin login
+                        $_SESSION['admin_id'] = $user['id'];
+                        $_SESSION['admin_role'] = $user['role'];
                         $_SESSION['is_admin'] = true;
+                        
+                        // Update last login
+                        $stmt = $pdo->prepare("UPDATE admins SET last_login = NOW() WHERE admin_id = ?");
+                        $stmt->execute([$user['id']]);
+                        
+                        // Log admin activity
+                        $stmt = $pdo->prepare("
+                            INSERT INTO admin_logs (admin_id, action_type, description, ip_address, user_agent)
+                            VALUES (?, 'other', 'Admin logged in', ?, ?)
+                        ");
+                        $stmt->execute([
+                            $user['id'],
+                            $_SERVER['REMOTE_ADDR'] ?? null,
+                            $_SERVER['HTTP_USER_AGENT'] ?? null
+                        ]);
+                        
                         header('Location: ../admin/dashboard.php');
                     } else {
-                        // Regular user
+                        // Regular user login
+                        $_SESSION['user_id'] = $user['id'];
+                        $_SESSION['user_type'] = $user['user_type'];
+                        $_SESSION['is_admin'] = false;
+                        
+                        // Update last login
+                        $stmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE user_id = ?");
+                        $stmt->execute([$user['id']]);
+                        
+                        // Log activity
+                        logActivity($pdo, $user['id'], 'login', 'User logged in');
+                        
                         header('Location: dashboard.php');
                     }
                     exit;

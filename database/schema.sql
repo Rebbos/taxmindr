@@ -1,7 +1,7 @@
 -- TaxMindr Database Schema
 -- Philippine Tax Compliance Platform
 
--- Users table
+-- Users table (Regular users only - NOT admins)
 CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -20,6 +20,31 @@ CREATE TABLE IF NOT EXISTS users (
     status ENUM('active', 'inactive', 'suspended') DEFAULT 'active',
     INDEX idx_email (email),
     INDEX idx_tin (tin)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Admins table (Separate from users - admins only)
+CREATE TABLE IF NOT EXISTS admins (
+    admin_id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    mobile_number VARCHAR(20),
+    role ENUM('super_admin', 'admin', 'moderator', 'support') DEFAULT 'admin',
+    permissions JSON,
+    can_manage_users BOOLEAN DEFAULT TRUE,
+    can_manage_tax_updates BOOLEAN DEFAULT TRUE,
+    can_view_analytics BOOLEAN DEFAULT TRUE,
+    can_manage_system_settings BOOLEAN DEFAULT FALSE,
+    department VARCHAR(100),
+    notes TEXT,
+    email_verified BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_login TIMESTAMP NULL,
+    status ENUM('active', 'inactive', 'suspended') DEFAULT 'active',
+    INDEX idx_email (email),
+    INDEX idx_role (role)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tax types reference

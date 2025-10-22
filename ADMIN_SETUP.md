@@ -1,22 +1,61 @@
-# Admin System Setup Guide
+# Admin System Setup Guide - Separate Tables Approach
 
 ## Overview
-TaxMindr now supports a universal login system where both regular users and administrators use the same login page (`/public/login.php`). After authentication, users are redirected based on their role:
-- **Admins** → `/admin/dashboard.php`
-- **Regular Users** → `/public/dashboard.php`
+TaxMindr uses a **universal login page** (`/public/login.php`) for both admins and regular users, but they are stored in **completely separate database tables**:
+- **`admins`** table - For administrators only
+- **`users`** table - For regular users only
+
+### How Universal Login Works:
+1. User enters email/password on `/public/login.php`
+2. System checks **admins** table first
+3. If not found, system checks **users** table
+4. Based on which table the account is in, redirect accordingly:
+   - **Admin** → `/admin/dashboard.php` (admin-only pages)
+   - **User** → `/public/dashboard.php` (user-only pages)
+
+### Access Control:
+- ✅ Admins **cannot** access user pages
+- ✅ Users **cannot** access admin pages  
+- ✅ Each has their own isolated interface
+- ✅ Separate session management (`$_SESSION['admin_id']` vs `$_SESSION['user_id']`)
 
 ## Database Schema
 
-### New Tables Created:
-1. **`admins`** - Admin-specific permissions and settings
-2. **`admin_logs`** - Detailed audit trail of all admin actions
-3. **`system_settings`** - System-wide configurable settings
-4. **`user_reports`** - User-submitted reports/complaints for admin review
+### Admins Table (Separate)
+```sql
+CREATE TABLE admins (
+    admin_id INT PRIMARY KEY,
+    email VARCHAR(255) UNIQUE,
+    password_hash VARCHAR(255),
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    role ENUM('super_admin', 'admin', 'moderator', 'support'),
+    can_manage_users BOOLEAN,
+    can_manage_tax_updates BOOLEAN,
+    can_view_analytics BOOLEAN,
+    can_manage_system_settings BOOLEAN,
+    -- ... other admin-specific fields
+);
+```
 
-### Modified Tables:
-- **`users.user_type`** - Now includes `'admin'` option
-- **`tax_types.applicable_to`** - Updated to include admin
-- **`tax_updates.affected_taxpayers`** - Updated to include admin
+### Users Table (Regular Users)
+```sql
+CREATE TABLE users (
+    user_id INT PRIMARY KEY,
+    email VARCHAR(255) UNIQUE,
+    password_hash VARCHAR(255),
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    user_type ENUM('individual', 'business', 'freelancer', 'organization'),
+    tin VARCHAR(20),
+    -- ... other user-specific fields
+);
+```
+
+### Supporting Tables:
+- **`admin_logs`** - Admin activity audit trail
+- **`system_settings`** - Admin-configurable settings
+- **`user_reports`** - User feedback for admin review
 
 ## Setup Instructions
 

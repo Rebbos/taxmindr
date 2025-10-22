@@ -8,13 +8,13 @@ require_once '../config/config.php';
 requireAdmin(); // Only admins can access
 
 $pdo = getDBConnection();
-$userId = $_SESSION['user_id'];
+$adminId = $_SESSION['admin_id'];
 $pageTitle = 'Admin Dashboard - TaxMindr';
 
 // Get admin info
-$adminInfo = getAdminPermissions($pdo, $userId);
-$stmt = $pdo->prepare("SELECT * FROM users WHERE user_id = ?");
-$stmt->execute([$userId]);
+$adminInfo = getAdminPermissions($pdo, $adminId);
+$stmt = $pdo->prepare("SELECT * FROM admins WHERE admin_id = ?");
+$stmt->execute([$adminId]);
 $user = $stmt->fetch();
 
 // Get statistics

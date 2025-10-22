@@ -59,17 +59,18 @@ function formatMobile($mobile) {
 }
 
 /**
- * Check if user is logged in
+ * Check if user is logged in (either admin or regular user)
  */
 function isLoggedIn() {
-    return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
+    return (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) || 
+           (isset($_SESSION['admin_id']) && !empty($_SESSION['admin_id']));
 }
 
 /**
- * Check if logged-in user is an admin
+ * Check if logged-in account is an admin
  */
 function isAdmin() {
-    return isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin';
+    return isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true;
 }
 
 /**
@@ -83,12 +84,29 @@ function requireLogin() {
 }
 
 /**
- * Redirect to admin dashboard if not admin
+ * Require admin access - redirect if not admin
  */
 function requireAdmin() {
-    requireLogin();
     if (!isAdmin()) {
-        header('Location: ' . APP_URL . '/public/dashboard.php');
+        if (isset($_SESSION['user_id'])) {
+            // Logged in as user, redirect to user dashboard
+            header('Location: ' . APP_URL . '/public/dashboard.php');
+        } else {
+            // Not logged in, redirect to login
+            header('Location: ' . APP_URL . '/public/login.php');
+        }
+        exit;
+    }
+}
+
+/**
+ * Require user access - redirect if admin tries to access
+ */
+function requireUser() {
+    requireLogin();
+    if (isAdmin()) {
+        // Admin trying to access user page, redirect to admin dashboard
+        header('Location: ' . APP_URL . '/admin/dashboard.php');
         exit;
     }
 }
@@ -96,9 +114,9 @@ function requireAdmin() {
 /**
  * Get admin permissions
  */
-function getAdminPermissions($pdo, $userId) {
-    $stmt = $pdo->prepare("SELECT * FROM admins WHERE user_id = ?");
-    $stmt->execute([$userId]);
+function getAdminPermissions($pdo, $adminId) {
+    $stmt = $pdo->prepare("SELECT * FROM admins WHERE admin_id = ?");
+    $stmt->execute([$adminId]);
     return $stmt->fetch();
 }
 

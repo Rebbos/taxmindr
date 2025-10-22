@@ -16,42 +16,30 @@ try {
     $pdo = getDBConnection();
     
     // Check if admin already exists
-    $stmt = $pdo->prepare("SELECT user_id FROM users WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT admin_id FROM admins WHERE email = ?");
     $stmt->execute([$adminEmail]);
     $existing = $stmt->fetch();
     
     if ($existing) {
         echo "Admin user already exists with email: $adminEmail\n";
-        echo "User ID: " . $existing['user_id'] . "\n";
+        echo "Admin ID: " . $existing['admin_id'] . "\n";
         exit;
     }
     
-    // Create admin user
+    // Create admin account
     $passwordHash = password_hash($adminPassword, PASSWORD_DEFAULT);
     
     $stmt = $pdo->prepare("
-        INSERT INTO users (email, password_hash, first_name, last_name, user_type, status, email_verified)
-        VALUES (?, ?, ?, ?, 'admin', 'active', TRUE)
+        INSERT INTO admins (email, password_hash, first_name, last_name, role, status, email_verified, can_manage_users, can_manage_tax_updates, can_view_analytics, can_manage_system_settings, department)
+        VALUES (?, ?, ?, ?, 'super_admin', 'active', TRUE, TRUE, TRUE, TRUE, TRUE, 'System Administration')
     ");
     
     $stmt->execute([$adminEmail, $passwordHash, $firstName, $lastName]);
-    $userId = $pdo->lastInsertId();
-    
-    echo "✓ Admin user created successfully!\n";
-    echo "User ID: $userId\n";
-    echo "Email: $adminEmail\n";
-    
-    // Create admin record
-    $stmt = $pdo->prepare("
-        INSERT INTO admins (user_id, role, can_manage_users, can_manage_tax_updates, can_view_analytics, can_manage_system_settings, department)
-        VALUES (?, 'super_admin', TRUE, TRUE, TRUE, TRUE, 'System Administration')
-    ");
-    
-    $stmt->execute([$userId]);
     $adminId = $pdo->lastInsertId();
     
-    echo "✓ Admin permissions set successfully!\n";
+    echo "✓ Admin account created successfully!\n";
     echo "Admin ID: $adminId\n";
+    echo "Email: $adminEmail\n";
     echo "Role: Super Administrator\n\n";
     
     echo "===========================================\n";
