@@ -2,9 +2,9 @@
 <nav class="navbar navbar-light bg-white border-bottom sticky-top shadow-sm">
     <div class="container-fluid px-4">
         <div class="d-flex align-items-center w-100">
-            <!-- Burger Menu (only show when logged in) -->
+            <!-- Burger Menu (always show when logged in - desktop AND mobile) -->
             <?php if (isLoggedIn()): ?>
-            <button class="btn btn-link text-dark p-0 me-3" id="sidebarToggle" type="button" style="font-size: 1.75rem; line-height: 1;">
+            <button class="btn btn-link text-dark p-0 me-3 d-flex align-items-center justify-content-center" id="sidebarToggle" type="button" style="font-size: 1.75rem; line-height: 1; width: 40px; height: 40px;">
                 <i class="bi bi-list"></i>
             </button>
             <?php endif; ?>

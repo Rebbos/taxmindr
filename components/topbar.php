@@ -1,43 +1,34 @@
-<!-- Top Bar (Breadcrumb & Page Actions) -->
-<div class="topbar bg-white border-bottom py-3 mb-4">
-    <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center">
-            <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item">
-                        <a href="<?php echo APP_URL; ?>/public/dashboard.php">
-                            <i class="bi bi-house-door"></i>
-                        </a>
-                    </li>
-                    <?php if (isset($breadcrumbs) && is_array($breadcrumbs)): ?>
-                        <?php foreach ($breadcrumbs as $key => $crumb): ?>
-                            <?php if ($key === array_key_last($breadcrumbs)): ?>
-                                <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($crumb['label']); ?></li>
-                            <?php else: ?>
-                                <li class="breadcrumb-item">
-                                    <a href="<?php echo htmlspecialchars($crumb['url']); ?>"><?php echo htmlspecialchars($crumb['label']); ?></a>
-                                </li>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </ol>
-            </nav>
-            
-            <!-- Page Actions (optional) -->
-            <?php if (isset($pageActions) && !empty($pageActions)): ?>
-                <div class="d-flex gap-2">
-                    <?php foreach ($pageActions as $action): ?>
-                        <a href="<?php echo htmlspecialchars($action['url']); ?>" 
-                           class="btn btn-<?php echo $action['style'] ?? 'primary'; ?> btn-sm">
-                            <?php if (isset($action['icon'])): ?>
-                                <i class="bi bi-<?php echo $action['icon']; ?> me-1"></i>
-                            <?php endif; ?>
-                            <?php echo htmlspecialchars($action['label']); ?>
-                        </a>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        </div>
-    </div>
-</div>
+<!-- Decorative Top Bar - Accent Line (at the very top of page) -->
+<div class="topbar-accent"></div>
+
+<style>
+.topbar-accent {
+    height: 4px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    background: linear-gradient(90deg, 
+        var(--tm-primary), 
+        var(--tm-secondary), 
+        #8b5cf6,
+        var(--tm-secondary),
+        var(--tm-primary));
+    background-size: 200% 100%;
+    animation: gradientShift 8s ease infinite;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+/* Animated gradient effect */
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Add padding to body to account for topbar */
+body {
+    padding-top: 4px;
+}
+</style>

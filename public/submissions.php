@@ -29,6 +29,9 @@ include '../components/head.php';
 ?>
 
 <body>
+    <!-- Decorative topbar accent line at the very top -->
+    <?php include '../components/topbar.php'; ?>
+    
     <!-- Include modern navbar -->
     <?php include '../components/navbar.php'; ?>
     
@@ -38,11 +41,12 @@ include '../components/head.php';
         
         <!-- Main Content -->
         <main class="main-wrapper flex-grow-1 d-flex flex-column">
+            
             <?php
             $breadcrumbs = [
                 ['label' => 'Filing Archive', 'url' => '#']
             ];
-            include '../components/topbar.php';
+            include '../components/breadcrumb.php';
             ?>
             
             <div class="flex-grow-1">
