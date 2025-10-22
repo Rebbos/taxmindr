@@ -1,19 +1,5 @@
 <!-- Modern Sidebar -->
 <div class="sidebar bg-white border-end shadow-sm" id="sidebar">
-    <div class="sidebar-header p-4 border-bottom">
-        <div class="d-flex align-items-center">
-            <div class="brand-icon me-2">
-                <i class="bi bi-calendar-check-fill text-primary fs-4"></i>
-            </div>
-            <span class="brand-text fw-bold fs-5">
-                Tax<span class="text-primary">Mindr</span>
-            </span>
-        </div>
-        <button class="btn btn-link d-lg-none sidebar-toggle" type="button">
-            <i class="bi bi-x-lg"></i>
-        </button>
-    </div>
-    
     <div class="sidebar-body p-3">
         <!-- User Info Card -->
         <div class="user-card card border-0 bg-light mb-3">

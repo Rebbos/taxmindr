@@ -3,6 +3,17 @@
  * Bootstrap 5 + Custom Interactions
  */
 
+// Apply sidebar state IMMEDIATELY before DOM loads to prevent flash
+(function() {
+    if (window.innerWidth >= 992) {
+        const sidebarState = localStorage.getItem('sidebarState');
+        if (sidebarState === 'closed') {
+            // Add inline styles to prevent any layout shift
+            document.documentElement.style.setProperty('--sidebar-initial-state', 'closed');
+        }
+    }
+})();
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize tooltips
     initTooltips();
@@ -42,6 +53,7 @@ function initSidebar() {
     const sidebarToggle = document.getElementById('sidebarToggle');
     const toggleButtons = document.querySelectorAll('[data-sidebar-toggle]');
     const mainWrapper = document.querySelector('.main-wrapper');
+    const pageHeader = document.querySelector('.page-header');
     
     if (!sidebar) return;
     
@@ -49,9 +61,19 @@ function initSidebar() {
     if (window.innerWidth >= 992) {
         const sidebarState = localStorage.getItem('sidebarState');
         if (sidebarState === 'closed') {
+            // Apply state immediately WITHOUT transitions
             sidebar.classList.add('closed');
             if (mainWrapper) mainWrapper.classList.add('sidebar-closed');
+            if (pageHeader) pageHeader.classList.add('sidebar-closed');
         }
+        
+        // Add transitions AFTER state is restored (next frame)
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                if (mainWrapper) mainWrapper.style.transition = 'margin-left 0.3s ease';
+                if (pageHeader) pageHeader.style.transition = 'left 0.3s ease';
+            });
+        });
     }
     
     // Toggle sidebar via burger menu
@@ -61,6 +83,7 @@ function initSidebar() {
             if (window.innerWidth >= 992) {
                 sidebar.classList.toggle('closed');
                 if (mainWrapper) mainWrapper.classList.toggle('sidebar-closed');
+                if (pageHeader) pageHeader.classList.toggle('sidebar-closed');
                 
                 // Save state to localStorage
                 const isClosed = sidebar.classList.contains('closed');

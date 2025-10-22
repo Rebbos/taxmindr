@@ -32,9 +32,6 @@ include '../components/head.php';
     <!-- Decorative topbar accent line at the very top -->
     <?php include '../components/topbar.php'; ?>
     
-    <!-- Include modern navbar -->
-    <?php include '../components/navbar.php'; ?>
-    
     <div class="d-flex">
         <!-- Include modern sidebar -->
         <?php include '../components/sidebar.php'; ?>
@@ -46,7 +43,7 @@ include '../components/head.php';
             $breadcrumbs = [
                 ['label' => 'Filing Archive', 'url' => '#']
             ];
-            include '../components/breadcrumb.php';
+            include '../components/page-header.php';
             ?>
             
             <div class="flex-grow-1">

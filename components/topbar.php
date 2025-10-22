@@ -3,7 +3,7 @@
 
 <style>
 .topbar-accent {
-    height: 4px;
+    height: 8px;
     width: 100%;
     position: fixed;
     top: 0;
@@ -17,7 +17,7 @@
         var(--tm-primary));
     background-size: 200% 100%;
     animation: gradientShift 8s ease infinite;
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 3px 12px rgba(37, 99, 235, 0.3);
 }
 
 /* Animated gradient effect */
@@ -29,6 +29,6 @@
 
 /* Add padding to body to account for topbar */
 body {
-    padding-top: 4px;
+    padding-top: 8px;
 }
 </style>

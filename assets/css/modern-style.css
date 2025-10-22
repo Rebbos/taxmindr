@@ -74,7 +74,9 @@ h1, h2, h3, h4, h5, h6 {
     height: var(--navbar-height);
     backdrop-filter: blur(10px);
     background-color: rgba(255, 255, 255, 0.95) !important;
-    top: 4px !important; /* Account for topbar */
+    top: 8px !important; /* Account for topbar */
+    z-index: 1050; /* Ensure navbar is above sidebar */
+    display: none; /* Hide the global navbar - we're using page-header inside content */
 }
 
 .navbar-nav .nav-link {
@@ -119,12 +121,11 @@ h1, h2, h3, h4, h5, h6 {
 .sidebar {
     position: fixed;
     left: 0;
-    top: 4px; /* Account for topbar */
+    top: 8px; /* Account for topbar only, no navbar */
     width: var(--sidebar-width);
-    height: calc(100vh - 4px);
+    height: calc(100vh - 8px);
     z-index: 1040;
     overflow-y: auto;
-    transition: all 0.3s ease;
 }
 
 /* Sidebar closed state (desktop) */
@@ -169,17 +170,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .sidebar-body {
-    height: calc(100vh - var(--navbar-height) - 4px); /* Account for topbar */
+    /* Sidebar total height excludes only topbar */
+    height: calc(100vh - 8px);
     overflow-y: auto;
-    transition: all 0.3s ease;
 }
 
 /* Main wrapper adjustment for sidebar */
 .main-wrapper {
     margin-left: var(--sidebar-width);
-    margin-top: calc(var(--navbar-height) + 4px); /* Account for navbar + topbar */
-    min-height: calc(100vh - var(--navbar-height) - 4px);
-    transition: margin-left 0.3s ease;
+    margin-top: 8px; /* Account for topbar only */
+    min-height: calc(100vh - 8px);
+    padding: 0; /* Remove padding, let page-header and content control spacing */
+}
+
+.main-wrapper.sidebar-closed {
+    margin-left: 80px;
 }
 
 .main-wrapper.sidebar-closed {
@@ -188,11 +193,68 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Breadcrumb Styles */
 .breadcrumb-bar {
-    position: sticky;
-    top: var(--navbar-height);
-    z-index: 999;
+    position: static; /* Keep header within main content flow beside the sidebar */
+    top: auto;
+    z-index: auto;
+    backdrop-filter: none;
+    background-color: transparent;
+    margin-bottom: 1rem;
+}
+
+/* Page Header (internal to main content) */
+.page-header {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    margin: 0; /* Remove negative margins */
+    margin-bottom: 2rem;
+    position: fixed;
+    top: 8px; /* Right below the topbar accent */
+    left: var(--sidebar-width);
+    right: 0;
+    z-index: 100;
     backdrop-filter: blur(10px);
     background-color: rgba(255, 255, 255, 0.98) !important;
+}
+
+/* Adjust when sidebar is closed */
+.page-header.sidebar-closed {
+    left: 80px;
+}
+
+/* Add padding to content to account for fixed header */
+.main-wrapper .flex-grow-1 {
+    padding: 80px 2rem 2rem 2rem; /* Top padding for header + horizontal + bottom padding */
+}
+
+.page-header .breadcrumb {
+    font-size: 1.125rem;
+    margin-bottom: 0;
+}
+
+.page-header .breadcrumb-item {
+    display: flex;
+    align-items: center;
+}
+
+.page-header .breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    font-size: 1.4rem;
+    color: var(--tm-gray-400);
+    padding: 0 0.75rem;
+}
+
+.page-header .breadcrumb-item a {
+    color: var(--tm-gray-600);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.page-header .breadcrumb-item a:hover {
+    color: var(--tm-primary);
+}
+
+.page-header .breadcrumb-item.active {
+    color: var(--tm-gray-900);
+    font-weight: 600;
 }
 
 .breadcrumb-bar .breadcrumb {
@@ -262,7 +324,6 @@ h1, h2, h3, h4, h5, h6 {
     margin-left: var(--sidebar-width);
     min-height: 100vh;
     padding: 2rem;
-    transition: margin 0.3s ease;
 }
 
 @media (max-width: 991.98px) {

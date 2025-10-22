@@ -124,9 +124,8 @@
                 <?php else: ?>
                     <a class="btn btn-outline-primary me-2" href="<?php echo APP_URL; ?>/public/login.php">Login</a>
                     <a class="btn btn-primary" href="<?php echo APP_URL; ?>/public/register.php">Get Started</a>
-                    </li>
                 <?php endif; ?>
-            </ul>
+            </div>
         </div>
     </div>
 </nav>
