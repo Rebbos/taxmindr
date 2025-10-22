@@ -29,11 +29,15 @@ $pageTitle = 'Home - TaxMindr';
                     <li><a href="features.php">Features</a></li>
                     <li><a href="about.php">About</a></li>
                     <?php if (isLoggedIn()): ?>
-                        <li><a href="dashboard.php">Dashboard</a></li>
-                        <li><a href="logout.php">Logout</a></li>
+                        <?php if (isAdmin()): ?>
+                            <li><a href="../admin/dashboard.php">Admin Dashboard</a></li>
+                        <?php else: ?>
+                            <li><a href="../public/dashboard.php">Dashboard</a></li>
+                        <?php endif; ?>
+                        <li><a href="../public/logout.php">Logout</a></li>
                     <?php else: ?>
-                        <li><a href="login.php">Login</a></li>
-                        <li><a href="register.php" class="btn-primary">Get Started</a></li>
+                        <li><a href="../public/login.php">Login</a></li>
+                        <li><a href="../public/register.php" class="btn-primary">Get Started</a></li>
                     <?php endif; ?>
                 </ul>
             </div>
@@ -48,7 +52,7 @@ $pageTitle = 'Home - TaxMindr';
                     <h2>Never Miss a Tax Deadline Again</h2>
                     <p>TaxMindr helps Filipinos stay compliant with BIR requirements through smart reminders, validation tools, and tax updates.</p>
                     <div class="hero-buttons">
-                        <a href="register.php" class="btn-primary btn-large">Get Started Free</a>
+                        <a href="../public/register.php" class="btn-primary btn-large">Get Started Free</a>
                         <a href="features.php" class="btn-secondary btn-large">Learn More</a>
                     </div>
                 </div>
@@ -133,11 +137,11 @@ $pageTitle = 'Home - TaxMindr';
         </section>
 
         <!-- CTA Section -->
-        <section class="cta">
+            <div class="cta">
             <div class="container">
                 <h2>Ready to Simplify Your Tax Compliance?</h2>
                 <p>Join Filipino freelancers, businesses, and organizations staying on top of their tax responsibilities.</p>
-                <a href="register.php" class="btn-primary btn-large">Start Using TaxMindr</a>
+                <a href="../public/register.php" class="btn-primary btn-large">Start Using TaxMindr</a>
             </div>
         </section>
     </main>
