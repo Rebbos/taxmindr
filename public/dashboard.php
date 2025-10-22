@@ -89,15 +89,24 @@ include '../components/head.php';
         <?php include '../components/sidebar.php'; ?>
         
         <!-- Main Content -->
-        <main class="main-wrapper flex-grow-1">
-            <!-- Page Header -->
-            <div class="mb-4 fade-in-up">
-                <h1 class="h3 fw-bold mb-2">
-                    Welcome back, <?php echo htmlspecialchars($user['first_name']); ?>! 
-                    <span class="wave">👋</span>
-                </h1>
-                <p class="text-muted mb-0">Here's your tax compliance overview</p>
-            </div>
+        <main class="main-wrapper flex-grow-1 d-flex flex-column">
+            <?php
+            // Set breadcrumbs
+            $breadcrumbs = [
+                ['label' => 'Dashboard', 'url' => '#']
+            ];
+            include '../components/topbar.php';
+            ?>
+            
+            <div class="flex-grow-1">
+                <!-- Page Header -->
+                <div class="mb-4 fade-in-up">
+                    <h1 class="h3 fw-bold mb-2">
+                        Welcome back, <?php echo htmlspecialchars($user['first_name']); ?>! 
+                        <span class="wave">👋</span>
+                    </h1>
+                    <p class="text-muted mb-0">Here's your tax compliance overview</p>
+                </div>
             
             <!-- Statistics Cards -->
             <div class="row g-4 mb-4">
@@ -265,6 +274,10 @@ include '../components/head.php';
                     </div>
                 </div>
             </div>
+            </div>
+            
+            <!-- Include page footer -->
+            <?php include '../components/page-footer.php'; ?>
         </main>
     </div>
     

@@ -106,9 +106,16 @@ include '../components/head.php';
         <?php include '../components/sidebar.php'; ?>
         
         <!-- Main Content -->
-        <main class="main-wrapper flex-grow-1">
-            <div class="d-flex justify-content-between align-items-center mb-4 fade-in-up">
-                <div>
+        <main class="main-wrapper flex-grow-1 d-flex flex-column">
+            <?php
+            $breadcrumbs = [
+                ['label' => 'Upload Withholding', 'url' => '#']
+            ];
+            include '../components/topbar.php';
+            ?>
+            
+            <div class="flex-grow-1">
+                <div class="mb-4 fade-in-up">
                     <h1 class="h3 fw-bold mb-2">
                         <i class="bi bi-file-earmark-spreadsheet me-2"></i>Upload Withholding List</h1>
                     <p>Upload and validate your withholding tax lists</p>
@@ -292,6 +299,12 @@ include '../components/head.php';
             }
         }
     </style>
+    </div>
     
-    <!-- Include modern footer -->
-    <?php include '../components/foot.php'; ?>
+    <!-- Include page footer -->
+    <?php include '../components/page-footer.php'; ?>
+</main>
+</div>
+
+<!-- Include modern footer -->
+<?php include '../components/foot.php'; ?>

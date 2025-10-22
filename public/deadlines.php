@@ -58,19 +58,26 @@ include '../components/head.php';
         <?php include '../components/sidebar.php'; ?>
         
         <!-- Main Content -->
-        <main class="main-wrapper flex-grow-1">
-            <!-- Page Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4 fade-in-up">
-                <div>
+        <main class="main-wrapper flex-grow-1 d-flex flex-column">
+            <?php
+            // Set breadcrumbs and page actions
+            $breadcrumbs = [
+                ['label' => 'Deadlines', 'url' => '#']
+            ];
+            $pageActions = [
+                ['label' => 'Add Deadline', 'url' => 'add_deadline.php', 'icon' => 'plus-lg', 'style' => 'primary']
+            ];
+            include '../components/topbar.php';
+            ?>
+            
+            <div class="flex-grow-1">
+                <!-- Page Header -->
+                <div class="mb-4 fade-in-up">
                     <h1 class="h3 fw-bold mb-2">
                         <i class="bi bi-calendar-event me-2"></i>Tax Deadlines
                     </h1>
                     <p class="text-muted mb-0">Track and manage your tax filing deadlines</p>
                 </div>
-                <a href="add_deadline.php" class="btn btn-primary">
-                    <i class="bi bi-plus-lg me-1"></i>Add Deadline
-                </a>
-            </div>
             
             <!-- Filters -->
             <div class="card mb-4">
@@ -184,6 +191,10 @@ include '../components/head.php';
                     </div>
                 <?php endif; ?>
             </div>
+            </div>
+            
+            <!-- Include page footer -->
+            <?php include '../components/page-footer.php'; ?>
         </main>
     </div>
     

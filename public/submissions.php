@@ -37,7 +37,15 @@ include '../components/head.php';
         <?php include '../components/sidebar.php'; ?>
         
         <!-- Main Content -->
-        <main class="main-wrapper flex-grow-1">
+        <main class="main-wrapper flex-grow-1 d-flex flex-column">
+            <?php
+            $breadcrumbs = [
+                ['label' => 'Filing Archive', 'url' => '#']
+            ];
+            include '../components/topbar.php';
+            ?>
+            
+            <div class="flex-grow-1">
             <div class="page-header">
                 <div>
                     <h1>📁 Filing Archive</h1>
@@ -134,6 +142,12 @@ include '../components/head.php';
             color: #991b1b;
         }
     </style>
+    </div>
     
-    <!-- Include modern footer -->
-    <?php include '../components/foot.php'; ?>
+    <!-- Include page footer -->
+    <?php include '../components/page-footer.php'; ?>
+</main>
+</div>
+
+<!-- Include modern footer -->
+<?php include '../components/foot.php'; ?>

@@ -51,7 +51,15 @@ include '../components/head.php';
         <?php include '../components/sidebar.php'; ?>
         
         <!-- Main Content -->
-        <main class="main-wrapper flex-grow-1">
+        <main class="main-wrapper flex-grow-1 d-flex flex-column">
+            <?php
+            $breadcrumbs = [
+                ['label' => 'Tax Updates', 'url' => '#']
+            ];
+            include '../components/topbar.php';
+            ?>
+            
+            <div class="flex-grow-1">
             <div class="page-header">
                 <div>
                     <h1>📰 Tax Updates & BIR Announcements</h1>
@@ -254,6 +262,12 @@ include '../components/head.php';
             border-top: 1px solid var(--border-color);
         }
     </style>
+    </div>
     
-    <!-- Include modern footer -->
-    <?php include '../components/foot.php'; ?>
+    <!-- Include page footer -->
+    <?php include '../components/page-footer.php'; ?>
+</main>
+</div>
+
+<!-- Include modern footer -->
+<?php include '../components/foot.php'; ?>
