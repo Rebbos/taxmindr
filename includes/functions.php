@@ -66,12 +66,70 @@ function isLoggedIn() {
 }
 
 /**
+ * Check if logged-in user is an admin
+ */
+function isAdmin() {
+    return isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'admin';
+}
+
+/**
  * Redirect to login if not authenticated
  */
 function requireLogin() {
     if (!isLoggedIn()) {
         header('Location: ' . APP_URL . '/public/login.php');
         exit;
+    }
+}
+
+/**
+ * Redirect to admin dashboard if not admin
+ */
+function requireAdmin() {
+    requireLogin();
+    if (!isAdmin()) {
+        header('Location: ' . APP_URL . '/public/dashboard.php');
+        exit;
+    }
+}
+
+/**
+ * Get admin permissions
+ */
+function getAdminPermissions($pdo, $userId) {
+    $stmt = $pdo->prepare("SELECT * FROM admins WHERE user_id = ?");
+    $stmt->execute([$userId]);
+    return $stmt->fetch();
+}
+
+/**
+ * Log admin activity
+ */
+function logAdminActivity($pdo, $adminId, $actionType, $description, $affectedUserId = null, $relatedTable = null, $relatedId = null, $oldValue = null, $newValue = null) {
+    try {
+        $stmt = $pdo->prepare("
+            INSERT INTO admin_logs 
+            (admin_id, action_type, description, affected_user_id, related_table, related_id, old_value, new_value, ip_address, user_agent) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        
+        $stmt->execute([
+            $adminId,
+            $actionType,
+            $description,
+            $affectedUserId,
+            $relatedTable,
+            $relatedId,
+            $oldValue,
+            $newValue,
+            $_SERVER['REMOTE_ADDR'] ?? null,
+            $_SERVER['HTTP_USER_AGENT'] ?? null
+        ]);
+        
+        return true;
+    } catch (PDOException $e) {
+        error_log("Admin Activity Log Error: " . $e->getMessage());
+        return false;
     }
 }
 

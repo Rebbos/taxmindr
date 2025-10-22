@@ -50,8 +50,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Log activity
                     logActivity($pdo, $user['user_id'], 'login', 'User logged in');
                     
-                    // Redirect to dashboard
-                    header('Location: dashboard.php');
+                    // Role-based redirection
+                    if ($user['user_type'] === 'admin') {
+                        // Check if admin record exists, if not redirect to admin dashboard
+                        $stmt = $pdo->prepare("SELECT admin_id FROM admins WHERE user_id = ?");
+                        $stmt->execute([$user['user_id']]);
+                        $_SESSION['is_admin'] = true;
+                        header('Location: ../admin/dashboard.php');
+                    } else {
+                        // Regular user
+                        header('Location: dashboard.php');
+                    }
                     exit;
                 }
             } else {

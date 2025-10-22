@@ -186,3 +186,80 @@ CREATE TABLE IF NOT EXISTS atc_codes (
     category VARCHAR(100),
     is_active BOOLEAN DEFAULT TRUE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Admin-specific table for permissions and settings
+CREATE TABLE IF NOT EXISTS admins (
+    admin_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    role ENUM('super_admin', 'admin', 'moderator', 'support') DEFAULT 'admin',
+    permissions JSON, -- Store specific permissions as JSON
+    can_manage_users BOOLEAN DEFAULT TRUE,
+    can_manage_tax_updates BOOLEAN DEFAULT TRUE,
+    can_view_analytics BOOLEAN DEFAULT TRUE,
+    can_manage_system_settings BOOLEAN DEFAULT FALSE,
+    department VARCHAR(100),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    INDEX idx_role (role)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Admin activity logs (separate from regular user activity)
+CREATE TABLE IF NOT EXISTS admin_logs (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    admin_id INT NOT NULL,
+    action_type ENUM('user_created', 'user_updated', 'user_deleted', 'user_suspended', 
+                     'tax_update_posted', 'tax_update_edited', 'tax_update_deleted',
+                     'system_setting_changed', 'report_generated', 'data_export', 'other') NOT NULL,
+    description TEXT NOT NULL,
+    affected_user_id INT NULL,
+    related_table VARCHAR(100),
+    related_id INT,
+    old_value TEXT, -- Store old value for audit trail
+    new_value TEXT, -- Store new value for audit trail
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (admin_id) REFERENCES admins(admin_id) ON DELETE CASCADE,
+    FOREIGN KEY (affected_user_id) REFERENCES users(user_id) ON DELETE SET NULL,
+    INDEX idx_admin_action (admin_id, created_at),
+    INDEX idx_action_type (action_type),
+    INDEX idx_affected_user (affected_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- System settings (admin-configurable)
+CREATE TABLE IF NOT EXISTS system_settings (
+    setting_id INT AUTO_INCREMENT PRIMARY KEY,
+    setting_key VARCHAR(100) UNIQUE NOT NULL,
+    setting_value TEXT,
+    setting_type ENUM('text', 'number', 'boolean', 'json') DEFAULT 'text',
+    description TEXT,
+    is_public BOOLEAN DEFAULT FALSE, -- Whether regular users can see this setting
+    updated_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (updated_by) REFERENCES users(user_id) ON DELETE SET NULL,
+    INDEX idx_setting_key (setting_key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- User reports/complaints (for admin review)
+CREATE TABLE IF NOT EXISTS user_reports (
+    report_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    report_type ENUM('bug', 'feature_request', 'complaint', 'inquiry', 'other') NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    priority ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium',
+    status ENUM('pending', 'in_progress', 'resolved', 'closed') DEFAULT 'pending',
+    assigned_to INT NULL, -- Admin ID
+    admin_notes TEXT,
+    resolved_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (assigned_to) REFERENCES admins(admin_id) ON DELETE SET NULL,
+    INDEX idx_user_report (user_id, created_at),
+    INDEX idx_status (status),
+    INDEX idx_assigned (assigned_to)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
