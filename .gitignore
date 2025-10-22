@@ -1,0 +1,41 @@
+# TaxMindr - Git Ignore File
+
+# Configuration files with sensitive data
+config/database.php
+config/config.php
+
+# Uploaded files
+uploads/*
+!uploads/.gitkeep
+
+# Logs
+*.log
+logs/*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-*
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Composer
+vendor/
+composer.lock
+
+# Node modules (if using npm)
+node_modules/
+package-lock.json
+
+# Environment files
+.env
+.env.local
